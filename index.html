@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Split Bill for Drinks</title>
   <style>
-    /* Apple-Inspired Styling with Adjustments for Stepper */
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       margin: 0;
@@ -16,24 +15,24 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      overflow: auto;
     }
 
     .container {
-      max-width: 600px;
+      max-width: 700px;
       width: 100%;
       background-color: #ffffff;
-      padding: 20px 30px;
+      padding: 30px;
       border-radius: 16px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       text-align: center;
-      overflow-y: auto;
     }
 
     h1 {
       font-size: 28px;
       font-weight: 700;
       color: #1d1d1f;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
     }
 
     .input-card {
@@ -47,95 +46,47 @@
       margin-bottom: 10px;
     }
 
-    .input-card input,
-    .input-card .stepper {
-      width: 100%;
-      max-width: 300px;
-      height: 40px;
-      font-size: 16px;
-      border: 1px solid #d1d1d6;
-      border-radius: 12px;
-      text-align: center;
-      background-color: #f9f9f9;
-      box-sizing: border-box;
-      outline: none;
-    }
-
-    .stepper {
+    .number-picker {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px; /* Adds space between + and - buttons and the text box */
-      padding: 5px;
-      border-radius: 12px; /* Outer box is rounded */
-      background-color: #f5f5f7;
-    }
-
-    .stepper button {
-      width: 35px;
-      height: 35px;
-      font-size: 16px;
-      font-weight: bold;
-      background-color: #e5e5ea;
-      color: #1d1d1f;
-      border: none;
-      border-radius: 50%; /* Fully round buttons */
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-
-    .stepper button:hover {
-      background-color: #d2d2d7;
-    }
-
-    .bottle-card {
-      background-color: #f9f9f9;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 20px;
-      text-align: left;
-      border: 1px solid #d1d1d6;
-    }
-
-    .bottle-card h3 {
-      font-size: 16px;
-      font-weight: 600;
-      color: #1d1d1f;
-      margin-bottom: 10px;
-    }
-
-    .participant-input {
-      display: flex;
-      align-items: center;
       gap: 10px;
-      margin-bottom: 10px;
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto;
     }
 
-    .participant-input input {
-      flex: 1;
-      height: 35px;
-      border: 1px solid #d1d1d6;
-      border-radius: 8px;
-      padding: 5px 10px;
-      background-color: #ffffff;
-      font-size: 14px;
-    }
-
-    .participant-input button {
-      height: 35px;
-      padding: 0 10px;
-      font-size: 14px;
-      font-weight: 600;
+    .number-picker button {
+      width: 40px;
+      height: 40px;
+      font-size: 18px;
+      font-weight: bold;
       color: #ffffff;
       background-color: #007aff;
       border: none;
-      border-radius: 8px;
+      border-radius: 50%;
       cursor: pointer;
-      transition: background-color 0.2s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background-color 0.3s ease;
     }
 
-    .participant-input button:hover {
+    .number-picker button:hover {
       background-color: #005ecb;
+    }
+
+    .number-picker input {
+      width: 60px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 500;
+      border: 1px solid #d1d1d6;
+      border-radius: 8px;
+      padding: 5px;
+      background-color: #f9f9f9;
+      box-sizing: border-box;
+      outline: none;
     }
 
     button.calculate-btn {
@@ -158,22 +109,26 @@
       background-color: #005ecb;
     }
 
-    @media (max-width: 768px) {
-      h1 {
-        font-size: 24px;
-      }
+    .table-container {
+      margin-top: 30px;
+      text-align: left;
+    }
 
-      .input-card input,
-      .stepper button,
-      .participant-input input {
-        font-size: 14px;
-        height: 35px;
-      }
+    .result-container {
+      margin-top: 20px;
+      text-align: left;
+    }
 
-      .input-card h2,
-      .bottle-card h3 {
-        font-size: 16px;
-      }
+    .result-container ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .result-container ul li {
+      margin-bottom: 5px;
+      font-size: 16px;
+      font-weight: 500;
+      color: #1d1d1f;
     }
   </style>
 </head>
@@ -188,14 +143,14 @@
 
     <div class="input-card">
       <h2>Number of Bottles</h2>
-      <div class="stepper">
+      <div class="number-picker">
         <button type="button" onclick="adjustBottles(-1)">-</button>
-        <input type="number" id="numBottles" value="1" min="1">
+        <input type="number" id="numBottles" value="1" min="1" />
         <button type="button" onclick="adjustBottles(1)">+</button>
       </div>
     </div>
 
-    <div id="bottleContainer"></div>
+    <div class="table-container" id="tableContainer"></div>
 
     <div class="input-card">
       <h2>PromptPay/Bank Account</h2>
@@ -203,10 +158,15 @@
     </div>
 
     <button type="button" class="calculate-btn" onclick="calculateBill()">Calculate</button>
+
+    <div class="result-container" id="resultContainer"></div>
   </div>
 
   <script>
-    const bottleContainer = document.getElementById("bottleContainer");
+    const tableContainer = document.getElementById("tableContainer");
+    const resultContainer = document.getElementById("resultContainer");
+
+    const participants = ["Guy", "Top", "Mark"]; // Example participants
 
     function adjustBottles(change) {
       const numBottlesInput = document.getElementById("numBottles");
@@ -214,37 +174,33 @@
       currentValue = Math.max(1, currentValue + change); // Ensure minimum value is 1
       numBottlesInput.value = currentValue;
 
-      renderBottleInputs(currentValue);
+      renderTable();
     }
 
-    function renderBottleInputs(numBottles) {
-      bottleContainer.innerHTML = ""; // Clear existing inputs
+    function renderTable() {
+      const numBottles = parseInt(document.getElementById("numBottles").value) || 1;
+
+      let tableHTML = '<table class="drink-table"><thead><tr><th></th>';
       for (let i = 1; i <= numBottles; i++) {
-        const bottleCard = document.createElement("div");
-        bottleCard.className = "bottle-card";
-        bottleCard.innerHTML = `
-          <h3>Bottle ${i} Participants</h3>
-          <div class="participant-input">
-            <input type="text" placeholder="Enter participant name" class="participant-name" />
-            <button type="button" onclick="addParticipant(${i})">Add</button>
-          </div>
-          <div id="participantList-${i}"></div>
-        `;
-        bottleContainer.appendChild(bottleCard);
+        tableHTML += `<th>Bottle ${i}</th>`;
       }
-    }
+      tableHTML += "</tr></thead><tbody>";
 
-    function addParticipant(bottleIndex) {
-      const participantList = document.getElementById(`participantList-${bottleIndex}`);
-      const participantInput = participantList.previousElementSibling.querySelector(".participant-name");
-      const participantName = participantInput.value.trim();
-      if (participantName) {
-        const participantDiv = document.createElement("div");
-        participantDiv.textContent = participantName;
-        participantDiv.style.marginBottom = "5px";
-        participantList.appendChild(participantDiv);
-        participantInput.value = "";
-      }
+      participants.forEach((participant, index) => {
+        tableHTML += `<tr><td>${participant}</td>`;
+        for (let i = 1; i <= numBottles; i++) {
+          tableHTML += `
+            <td>
+              <div class="checkbox-container">
+                <input type="checkbox" id="checkbox-${index}-${i}" />
+              </div>
+            </td>`;
+        }
+        tableHTML += "</tr>";
+      });
+
+      tableHTML += "</tbody></table>";
+      tableContainer.innerHTML = tableHTML;
     }
 
     function calculateBill() {
@@ -252,16 +208,39 @@
       const numBottles = parseInt(document.getElementById("numBottles").value);
       const accountDetails = document.getElementById("accountDetails").value.trim();
 
-      if (!totalAmount || !numBottles || numBottles <= 0) {
+      if (!totalAmount || numBottles <= 0) {
         alert("Please fill out all fields!");
         return;
       }
 
-      alert(`Calculation logic goes here!`);
+      const costPerBottle = totalAmount / numBottles;
+      const amounts = {};
+
+      participants.forEach((participant, index) => {
+        amounts[participant] = 0;
+        for (let i = 1; i <= numBottles; i++) {
+          const checkbox = document.getElementById(`checkbox-${index}-${i}`);
+          if (checkbox && checkbox.checked) {
+            amounts[participant] += costPerBottle / participants.length;
+          }
+        }
+      });
+
+      // Display results
+      let resultHTML = "<ul>";
+      for (const [participant, amount] of Object.entries(amounts)) {
+        resultHTML += `<li>${participant}: ${amount.toFixed(2)} Baht</li>`;
+      }
+      resultHTML += "</ul>";
+      resultContainer.innerHTML = resultHTML;
+
+      if (accountDetails) {
+        resultContainer.innerHTML += `<p><strong>Transfer to:</strong> ${accountDetails}</p>`;
+      }
     }
 
-    // Initialize with one bottle
-    renderBottleInputs(1);
+    // Initialize table
+    renderTable();
   </script>
 </body>
 </html>
