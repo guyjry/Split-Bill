@@ -245,7 +245,7 @@
         tableHTML += "</tr>";
       });
 
-      // Add a row with a participant input
+      // Add the "Add participant" textbox
       tableHTML += `<tr><td><input type="text" placeholder="Add participant" oninput="handleParticipantInput(this)" /></td>`;
       for (let i = 1; i <= numBottles; i++) {
         tableHTML += `<td></td>`;
@@ -256,18 +256,9 @@
 
     function handleParticipantInput(input) {
       const name = input.value.trim();
-      if (!input.nextElementSibling && name.length > 0) {
-        const tbody = tableContainer.querySelector("tbody");
-        const newRow = document.createElement("tr");
-
-        newRow.innerHTML = `<td><input type="text" placeholder="Add participant" oninput="handleParticipantInput(this)" /></td>`;
-        const numBottles = parseInt(document.getElementById("numBottles").value);
-
-        for (let i = 1; i <= numBottles; i++) {
-          newRow.innerHTML += "<td></td>";
-        }
-
-        tbody.appendChild(newRow);
+      if (name.length > 0 && !input.nextElementSibling) {
+        participants.push(name);
+        renderTable();
       }
     }
 
