@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Split Bill for Drinks</title>
   <style>
     body {
@@ -245,8 +245,7 @@
         tableHTML += "</tr>";
       });
 
-      // Add the "Add participant" textbox
-      tableHTML += `<tr><td><input type="text" placeholder="Add participant" oninput="handleParticipantInput(this)" /></td>`;
+      tableHTML += `<tr><td><input type="text" placeholder="Add participant" onblur="addParticipant(this)" /></td>`;
       for (let i = 1; i <= numBottles; i++) {
         tableHTML += `<td></td>`;
       }
@@ -254,9 +253,9 @@
       tableContainer.innerHTML = tableHTML;
     }
 
-    function handleParticipantInput(input) {
+    function addParticipant(input) {
       const name = input.value.trim();
-      if (!input.nextElementSibling && name.length >= 1) {
+      if (name.length > 0 && !participants.includes(name)) {
         participants.push(name);
         renderTable();
       }
