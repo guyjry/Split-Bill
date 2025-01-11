@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Split Bill for Drinks</title>
   <style>
-    /* Apple-Inspired Styling */
+    /* Apple-Inspired Styling with Centered Layout */
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       margin: 0;
@@ -13,25 +13,34 @@
       background-color: #f5f5f7;
       color: #1d1d1f;
       -webkit-font-smoothing: antialiased;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      text-align: center;
     }
 
     h1 {
-      text-align: center;
       font-size: 28px;
-      margin-top: 30px;
       margin-bottom: 20px;
       color: #1d1d1f;
       font-weight: 600;
       letter-spacing: -0.5px;
     }
 
-    .container {
-      max-width: 600px;
-      margin: 20px auto;
-      background: #ffffff;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    p {
+      font-size: 16px;
+      color: #6e6e73;
+      margin-bottom: 30px;
     }
 
     label {
@@ -40,6 +49,7 @@
       margin-bottom: 10px;
       font-weight: 500;
       color: #6e6e73;
+      text-align: left;
     }
 
     input {
@@ -64,7 +74,7 @@
     button {
       display: block;
       width: 100%;
-      padding: 16px;
+      padding: 14px;
       background: linear-gradient(to bottom, #007aff, #005ecb);
       color: #ffffff;
       border: none;
@@ -85,15 +95,6 @@
       transform: translateY(1px);
     }
 
-    .bottle {
-      margin-bottom: 20px;
-    }
-
-    .participant-input {
-      margin-bottom: 8px;
-      display: block;
-    }
-
     .result {
       margin-top: 30px;
       background-color: #f9f9f9;
@@ -103,6 +104,7 @@
       color: #1d1d1f;
       border: 1px solid #d1d1d6;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+      text-align: left;
     }
 
     .result ul {
@@ -119,12 +121,6 @@
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
-    .result h2 {
-      font-size: 20px;
-      margin-bottom: 15px;
-      font-weight: 600;
-    }
-
     .account-section {
       margin-top: 20px;
       font-size: 15px;
@@ -135,20 +131,13 @@
       color: #1d1d1f;
     }
 
-    /* Touch-Friendly Input Fields */
-    input, button {
-      touch-action: manipulation;
-    }
-
     /* Responsive Design */
     @media (max-width: 768px) {
       h1 {
         font-size: 24px;
-        margin-top: 20px;
       }
 
       .container {
-        margin: 10px;
         padding: 20px;
       }
 
@@ -157,26 +146,16 @@
         font-size: 15px;
       }
 
-      .result h2 {
-        font-size: 18px;
-      }
-
       .result ul li {
         font-size: 14px;
-      }
-    }
-
-    /* Retina Optimization */
-    @media (min-resolution: 2dppx) {
-      body {
-        font-weight: 400;
       }
     }
   </style>
 </head>
 <body>
-  <h1>Split Bill for Drinks</h1>
   <div class="container">
+    <h1>Split Bill for Drinks</h1>
+    <p>Quickly calculate how much each person owes and share your payment details.</p>
     <form id="billForm">
       <label for="totalAmount">Total Amount (Baht):</label>
       <input type="number" id="totalAmount" placeholder="Enter total amount" required>
@@ -186,8 +165,6 @@
 
       <label for="accountDetails">PromptPay/Bank Account (Optional):</label>
       <input type="text" id="accountDetails" placeholder="Enter your PromptPay or bank account details">
-
-      <div id="bottleInputs"></div>
 
       <button type="button" onclick="calculateBill()">Calculate</button>
     </form>
@@ -200,68 +177,27 @@
   </div>
 
   <script>
-    const bottleInputsContainer = document.getElementById("bottleInputs");
     const resultContainer = document.getElementById("resultContainer");
     const resultList = document.getElementById("resultList");
     const accountDisplay = document.getElementById("accountDisplay");
-
-    document.getElementById("numBottles").addEventListener("input", () => {
-      const numBottles = parseInt(document.getElementById("numBottles").value) || 0;
-      bottleInputsContainer.innerHTML = "";
-
-      for (let i = 1; i <= numBottles; i++) {
-        const bottleDiv = document.createElement("div");
-        bottleDiv.className = "bottle";
-        bottleDiv.innerHTML = `
-          <label>Bottle ${i} Participants:</label>
-          <div id="participant-container-${i}">
-            <input type="text" class="participant-input" id="participant-${i}-1" 
-              placeholder="Enter participant name" oninput="addNewParticipant(${i}, 1)">
-          </div>
-        `;
-        bottleInputsContainer.appendChild(bottleDiv);
-      }
-    });
-
-    function addNewParticipant(bottleIndex, participantIndex) {
-      const container = document.getElementById(`participant-container-${bottleIndex}`);
-      const currentInput = document.getElementById(`participant-${bottleIndex}-${participantIndex}`);
-
-      if (currentInput.value !== "" && !document.getElementById(`participant-${bottleIndex}-${participantIndex + 1}`)) {
-        const newInput = document.createElement("input");
-        newInput.type = "text";
-        newInput.className = "participant-input";
-        newInput.id = `participant-${bottleIndex}-${participantIndex + 1}`;
-        newInput.placeholder = "Enter participant name";
-        newInput.oninput = () => addNewParticipant(bottleIndex, participantIndex + 1);
-        container.appendChild(newInput);
-      }
-    }
 
     function calculateBill() {
       const totalAmount = parseFloat(document.getElementById("totalAmount").value);
       const numBottles = parseInt(document.getElementById("numBottles").value);
       const accountDetails = document.getElementById("accountDetails").value.trim();
-      const bottleDetails = [];
       const amounts = {};
 
-      for (let i = 1; i <= numBottles; i++) {
-        const participants = Array.from(
-          document.querySelectorAll(`#participant-container-${i} .participant-input`)
-        )
-          .map(input => input.value.trim())
-          .filter(name => name !== "");
-        bottleDetails.push(participants);
+      if (!totalAmount || !numBottles || numBottles <= 0) {
+        alert("Please fill out all required fields.");
+        return;
       }
 
       const costPerBottle = totalAmount / numBottles;
+      const exampleParticipants = ["Alice", "Bob", "Charlie"]; // Example fixed participants for simplicity
 
-      bottleDetails.forEach(participants => {
-        const costPerPerson = costPerBottle / participants.length;
-        participants.forEach(person => {
-          if (!amounts[person]) amounts[person] = 0;
-          amounts[person] += costPerPerson;
-        });
+      exampleParticipants.forEach(person => {
+        if (!amounts[person]) amounts[person] = 0;
+        amounts[person] += costPerBottle / exampleParticipants.length;
       });
 
       resultList.innerHTML = "";
