@@ -245,6 +245,7 @@
         tableHTML += "</tr>";
       });
 
+      // Add a row with a participant input
       tableHTML += `<tr><td><input type="text" placeholder="Add participant" oninput="handleParticipantInput(this)" /></td>`;
       for (let i = 1; i <= numBottles; i++) {
         tableHTML += `<td></td>`;
