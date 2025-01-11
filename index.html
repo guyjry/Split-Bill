@@ -2,66 +2,87 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Split Bill for Drinks</title>
   <style>
-    /* Minimalist Styling */
+    /* Apple-Inspired Styling */
     body {
-      font-family: 'Arial', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #f5f5f5;
-      color: #333;
+      background-color: #f5f5f7;
+      color: #1d1d1f;
+      -webkit-font-smoothing: antialiased;
     }
 
     h1 {
       text-align: center;
-      font-size: 24px;
-      margin-top: 20px;
-      color: #444;
+      font-size: 28px;
+      margin-top: 30px;
+      margin-bottom: 20px;
+      color: #1d1d1f;
+      font-weight: 600;
+      letter-spacing: -0.5px;
     }
 
     .container {
       max-width: 600px;
       margin: 20px auto;
       background: #ffffff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     label {
       display: block;
-      font-size: 14px;
-      margin-bottom: 5px;
-      color: #666;
+      font-size: 15px;
+      margin-bottom: 10px;
+      font-weight: 500;
+      color: #6e6e73;
     }
 
     input {
       width: 100%;
-      padding: 10px;
-      margin: 5px 0 15px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 14px;
+      padding: 14px;
+      margin-bottom: 20px;
+      border: 1px solid #d1d1d6;
+      border-radius: 12px;
+      font-size: 16px;
       background-color: #f9f9f9;
+      box-sizing: border-box;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    input:focus {
+      border: 1px solid #007aff;
+      box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.2);
+      background-color: #ffffff;
     }
 
     button {
       display: block;
       width: 100%;
-      padding: 10px;
-      background-color: #4CAF50;
-      color: #fff;
+      padding: 16px;
+      background: linear-gradient(to bottom, #007aff, #005ecb);
+      color: #ffffff;
       border: none;
-      border-radius: 5px;
+      border-radius: 12px;
       font-size: 16px;
+      font-weight: 600;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      -webkit-appearance: none;
     }
 
     button:hover {
-      background-color: #45a049;
+      background: linear-gradient(to bottom, #005ecb, #007aff);
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: translateY(1px);
     }
 
     .bottle {
@@ -69,17 +90,19 @@
     }
 
     .participant-input {
-      margin-bottom: 5px;
+      margin-bottom: 8px;
       display: block;
     }
 
     .result {
-      margin-top: 20px;
+      margin-top: 30px;
       background-color: #f9f9f9;
-      padding: 10px;
-      border-radius: 5px;
-      font-size: 14px;
-      color: #444;
+      padding: 20px;
+      border-radius: 12px;
+      font-size: 16px;
+      color: #1d1d1f;
+      border: 1px solid #d1d1d6;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
     }
 
     .result ul {
@@ -88,17 +111,66 @@
     }
 
     .result ul li {
-      background-color: #e8e8e8;
-      margin: 5px 0;
-      padding: 8px;
-      border-radius: 5px;
-      font-size: 14px;
+      background-color: #ffffff;
+      margin: 10px 0;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 16px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
     .result h2 {
-      font-size: 18px;
-      margin-bottom: 10px;
-      color: #333;
+      font-size: 20px;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    .account-section {
+      margin-top: 20px;
+      font-size: 15px;
+      color: #6e6e73;
+    }
+
+    .account-section strong {
+      color: #1d1d1f;
+    }
+
+    /* Touch-Friendly Input Fields */
+    input, button {
+      touch-action: manipulation;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 24px;
+        margin-top: 20px;
+      }
+
+      .container {
+        margin: 10px;
+        padding: 20px;
+      }
+
+      input, button {
+        padding: 12px;
+        font-size: 15px;
+      }
+
+      .result h2 {
+        font-size: 18px;
+      }
+
+      .result ul li {
+        font-size: 14px;
+      }
+    }
+
+    /* Retina Optimization */
+    @media (min-resolution: 2dppx) {
+      body {
+        font-weight: 400;
+      }
     }
   </style>
 </head>
@@ -112,14 +184,18 @@
       <label for="numBottles">Number of Bottles:</label>
       <input type="number" id="numBottles" placeholder="Enter number of bottles" min="1" required>
 
+      <label for="accountDetails">PromptPay/Bank Account (Optional):</label>
+      <input type="text" id="accountDetails" placeholder="Enter your PromptPay or bank account details">
+
       <div id="bottleInputs"></div>
 
       <button type="button" onclick="calculateBill()">Calculate</button>
     </form>
 
-    <div class="result" id="resultContainer">
+    <div class="result" id="resultContainer" style="display: none;">
       <h2>Amount to Pay Per Person:</h2>
       <ul id="resultList"></ul>
+      <div class="account-section" id="accountDisplay"></div>
     </div>
   </div>
 
@@ -127,11 +203,11 @@
     const bottleInputsContainer = document.getElementById("bottleInputs");
     const resultContainer = document.getElementById("resultContainer");
     const resultList = document.getElementById("resultList");
+    const accountDisplay = document.getElementById("accountDisplay");
 
-    // Generate input fields for bottles
     document.getElementById("numBottles").addEventListener("input", () => {
       const numBottles = parseInt(document.getElementById("numBottles").value) || 0;
-      bottleInputsContainer.innerHTML = ""; // Clear previous inputs
+      bottleInputsContainer.innerHTML = "";
 
       for (let i = 1; i <= numBottles; i++) {
         const bottleDiv = document.createElement("div");
@@ -147,7 +223,6 @@
       }
     });
 
-    // Dynamically add a new input field when the user types in the current one
     function addNewParticipant(bottleIndex, participantIndex) {
       const container = document.getElementById(`participant-container-${bottleIndex}`);
       const currentInput = document.getElementById(`participant-${bottleIndex}-${participantIndex}`);
@@ -163,14 +238,13 @@
       }
     }
 
-    // Calculate the bill
     function calculateBill() {
       const totalAmount = parseFloat(document.getElementById("totalAmount").value);
       const numBottles = parseInt(document.getElementById("numBottles").value);
+      const accountDetails = document.getElementById("accountDetails").value.trim();
       const bottleDetails = [];
       const amounts = {};
 
-      // Gather participants for each bottle
       for (let i = 1; i <= numBottles; i++) {
         const participants = Array.from(
           document.querySelectorAll(`#participant-container-${i} .participant-input`)
@@ -190,13 +264,16 @@
         });
       });
 
-      // Display results
       resultList.innerHTML = "";
       for (const [person, amount] of Object.entries(amounts)) {
         const li = document.createElement("li");
         li.textContent = `${person}: ${amount.toFixed(2)} baht`;
         resultList.appendChild(li);
       }
+
+      accountDisplay.innerHTML = accountDetails
+        ? `<p><strong>Transfer to:</strong> ${accountDetails}</p>`
+        : "";
       resultContainer.style.display = "block";
     }
   </script>
