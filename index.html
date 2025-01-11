@@ -263,7 +263,32 @@
     }
 
     function calculateBill() {
-      alert("Calculation logic goes here!");
+      const totalAmount = parseFloat(document.getElementById("totalAmount").value);
+      const numBottles = parseInt(document.getElementById("numBottles").value);
+      const amounts = {};
+
+      if (!totalAmount || numBottles <= 0) {
+        alert("Please enter valid inputs!");
+        return;
+      }
+
+      participants.forEach((participant, index) => {
+        amounts[participant] = 0;
+        for (let i = 1; i <= numBottles; i++) {
+          const checkbox = document.getElementById(`checkbox-${index}-${i}`);
+          if (checkbox && checkbox.checked) {
+            amounts[participant] += totalAmount / numBottles;
+          }
+        }
+      });
+
+      // Display the results
+      let resultHTML = "<ul>";
+      for (const [participant, amount] of Object.entries(amounts)) {
+        resultHTML += `<li>${participant}: ${amount.toFixed(2)} Baht</li>`;
+      }
+      resultHTML += "</ul>";
+      resultContainer.innerHTML = resultHTML;
     }
 
     renderTable();
