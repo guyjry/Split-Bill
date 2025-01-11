@@ -26,7 +26,7 @@
       display: block;
       margin-bottom: 5px;
     }
-    input, button {
+    select, input, button {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
@@ -42,8 +42,8 @@
     button:hover {
       background-color: #45a049;
     }
-    .bottle-inputs {
-      margin-bottom: 20px;
+    .bottle {
+      margin-bottom: 10px;
     }
     .result {
       display: none;
@@ -71,7 +71,7 @@
       <label for="numBottles">Number of Bottles:</label>
       <input type="number" id="numBottles" placeholder="Enter number of bottles" min="1" required>
 
-      <div id="bottleInputs" class="bottle-inputs"></div>
+      <div id="bottleInputs"></div>
 
       <button type="button" onclick="calculateBill()">Calculate</button>
     </form>
@@ -83,63 +83,90 @@
   </div>
 
   <script>
-    const bottleInputsContainer = document.getElementById('bottleInputs');
-    const form = document.getElementById('billForm');
+    const bottleInputsContainer = document.getElementById("bottleInputs");
+    const resultContainer = document.getElementById("resultContainer");
+    const resultList = document.getElementById("resultList");
+
+    // Load saved names from localStorage
+    const savedNames = JSON.parse(localStorage.getItem("names")) || [];
 
     // Generate input fields for bottles
-    document.getElementById('numBottles').addEventListener('input', () => {
-      const numBottles = parseInt(document.getElementById('numBottles').value) || 0;
-      bottleInputsContainer.innerHTML = ''; // Clear previous inputs
+    document.getElementById("numBottles").addEventListener("input", () => {
+      const numBottles = parseInt(document.getElementById("numBottles").value) || 0;
+      bottleInputsContainer.innerHTML = ""; // Clear previous inputs
 
       for (let i = 1; i <= numBottles; i++) {
-        const bottleDiv = document.createElement('div');
+        const bottleDiv = document.createElement("div");
+        bottleDiv.className = "bottle";
         bottleDiv.innerHTML = `
-          <label for="bottle${i}">Bottle ${i} Participants (comma-separated):</label>
-          <input type="text" id="bottle${i}" placeholder="e.g., Alice, Bob, Charlie">
+          <label for="bottle${i}">Bottle ${i} Participants:</label>
+          <div id="participants-${i}">
+            <select id="dropdown-${i}">
+              <option value="" disabled selected>Select a person</option>
+              ${savedNames.map(name => `<option value="${name}">${name}</option>`).join("")}
+            </select>
+            <button type="button" onclick="addParticipant(${i})">Add Participant</button>
+            <ul id="list-${i}"></ul>
+          </div>
         `;
         bottleInputsContainer.appendChild(bottleDiv);
       }
     });
 
+    // Add a participant to the list
+    function addParticipant(bottleIndex) {
+      const dropdown = document.getElementById(`dropdown-${bottleIndex}`);
+      const participant = dropdown.value;
+      const list = document.getElementById(`list-${bottleIndex}`);
+
+      if (participant && !Array.from(list.children).some(li => li.textContent === participant)) {
+        const li = document.createElement("li");
+        li.textContent = participant;
+        list.appendChild(li);
+      }
+    }
+
     // Calculate the bill
     function calculateBill() {
-      const totalAmount = parseFloat(document.getElementById('totalAmount').value);
-      const numBottles = parseInt(document.getElementById('numBottles').value);
+      const totalAmount = parseFloat(document.getElementById("totalAmount").value);
+      const numBottles = parseInt(document.getElementById("numBottles").value);
       const bottleDetails = [];
-      const resultContainer = document.getElementById('resultContainer');
-      const resultList = document.getElementById('resultList');
+      const amounts = {};
 
-      // Gather participants for each bottle
       for (let i = 1; i <= numBottles; i++) {
-        const participants = document.getElementById(`bottle${i}`).value
-          .split(',')
-          .map(name => name.trim())
-          .filter(name => name !== '');
+        const participants = Array.from(document.getElementById(`list-${i}`).children)
+          .map(li => li.textContent);
         bottleDetails.push(participants);
       }
 
-      // Calculate cost per bottle
       const costPerBottle = totalAmount / numBottles;
 
-      // Calculate amount per person
-      const amounts = {};
       bottleDetails.forEach(participants => {
         const costPerPerson = costPerBottle / participants.length;
         participants.forEach(person => {
           if (!amounts[person]) amounts[person] = 0;
           amounts[person] += costPerPerson;
+
+          // Save new participants to localStorage
+          if (!savedNames.includes(person)) {
+            savedNames.push(person);
+          }
         });
       });
 
+      // Save updated names to localStorage
+      localStorage.setItem("names", JSON.stringify(savedNames));
+
       // Display results
-      resultList.innerHTML = '';
+      resultList.innerHTML = "";
       for (const [person, amount] of Object.entries(amounts)) {
-        const li = document.createElement('li');
+        const li = document.createElement("li");
         li.textContent = `${person}: ${amount.toFixed(2)} baht`;
         resultList.appendChild(li);
       }
-      resultContainer.style.display = 'block';
+      resultContainer.style.display = "block";
     }
   </script>
 </body>
 </html>
+
