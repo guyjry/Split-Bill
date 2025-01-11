@@ -13,9 +13,8 @@
       color: #1d1d1f;
       display: flex;
       justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: auto;
+      align-items: flex-start;
+      min-height: 100vh;
     }
 
     .container {
@@ -26,6 +25,7 @@
       border-radius: 16px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       text-align: center;
+      margin: 30px auto;
     }
 
     h1 {
@@ -66,14 +66,14 @@
       justify-content: center;
       gap: 10px;
       width: 100%;
-      max-width: 300px;
+      max-width: 200px;
       margin: 0 auto;
     }
 
     .number-picker button {
-      width: 40px;
-      height: 40px;
-      font-size: 18px;
+      width: 30px;
+      height: 30px;
+      font-size: 14px;
       font-weight: bold;
       color: #ffffff;
       background-color: #007aff;
@@ -163,8 +163,15 @@
     }
 
     .result-container {
-      margin-top: 20px;
+      margin-top: 30px;
       text-align: left;
+    }
+
+    .result-container h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1d1d1f;
+      margin-bottom: 10px;
     }
 
     .result-container ul {
@@ -199,11 +206,6 @@
     </div>
 
     <div class="table-container" id="tableContainer"></div>
-
-    <div class="input-card">
-      <h2>PromptPay/Bank Account</h2>
-      <input type="text" id="accountDetails" placeholder="Enter PromptPay or bank account" />
-    </div>
 
     <button type="button" class="calculate-btn" onclick="calculateBill()">Calculate</button>
 
@@ -280,7 +282,7 @@
       });
 
       // Display the results
-      let resultHTML = "<ul>";
+      let resultHTML = '<h2>Payment Summary for Each Participant</h2><ul>';
       for (const [participant, amount] of Object.entries(amounts)) {
         resultHTML += `<li>${participant}: ${amount.toFixed(2)} Baht</li>`;
       }
