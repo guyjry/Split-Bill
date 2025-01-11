@@ -256,7 +256,7 @@
 
     function handleParticipantInput(input) {
       const name = input.value.trim();
-      if (name.length > 0 && !input.nextElementSibling) {
+      if (!input.nextElementSibling && name.length >= 1) {
         participants.push(name);
         renderTable();
       }
