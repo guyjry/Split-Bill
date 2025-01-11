@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Split Bill for Drinks</title>
   <style>
-    /* Apple-Inspired Styling with Vertical Centering */
+    /* Apple-Inspired Styling with Adjustments for Stepper */
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       margin: 0;
@@ -19,13 +19,14 @@
     }
 
     .container {
-      max-width: 400px;
+      max-width: 600px;
       width: 100%;
       background-color: #ffffff;
       padding: 20px 30px;
       border-radius: 16px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       text-align: center;
+      overflow-y: auto;
     }
 
     h1 {
@@ -49,37 +50,92 @@
     .input-card input,
     .input-card .stepper {
       width: 100%;
+      max-width: 300px;
       height: 40px;
       font-size: 16px;
       border: 1px solid #d1d1d6;
-      border-radius: 8px;
+      border-radius: 12px;
       text-align: center;
       background-color: #f9f9f9;
       box-sizing: border-box;
       outline: none;
     }
 
-    .input-card .stepper {
+    .stepper {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
+      gap: 12px; /* Adds space between + and - buttons and the text box */
+      padding: 5px;
+      border-radius: 12px; /* Outer box is rounded */
+      background-color: #f5f5f7;
     }
 
-    .input-card .stepper button {
-      width: 40px;
-      height: 40px;
-      font-size: 18px;
+    .stepper button {
+      width: 35px;
+      height: 35px;
+      font-size: 16px;
       font-weight: bold;
       background-color: #e5e5ea;
       color: #1d1d1f;
+      border: none;
+      border-radius: 50%; /* Fully round buttons */
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .stepper button:hover {
+      background-color: #d2d2d7;
+    }
+
+    .bottle-card {
+      background-color: #f9f9f9;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      text-align: left;
+      border: 1px solid #d1d1d6;
+    }
+
+    .bottle-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1d1d1f;
+      margin-bottom: 10px;
+    }
+
+    .participant-input {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .participant-input input {
+      flex: 1;
+      height: 35px;
+      border: 1px solid #d1d1d6;
+      border-radius: 8px;
+      padding: 5px 10px;
+      background-color: #ffffff;
+      font-size: 14px;
+    }
+
+    .participant-input button {
+      height: 35px;
+      padding: 0 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffffff;
+      background-color: #007aff;
       border: none;
       border-radius: 8px;
       cursor: pointer;
       transition: background-color 0.2s ease;
     }
 
-    .input-card .stepper button:hover {
-      background-color: #d2d2d7;
+    .participant-input button:hover {
+      background-color: #005ecb;
     }
 
     button.calculate-btn {
@@ -108,12 +164,14 @@
       }
 
       .input-card input,
-      .input-card .stepper button {
+      .stepper button,
+      .participant-input input {
         font-size: 14px;
         height: 35px;
       }
 
-      .input-card h2 {
+      .input-card h2,
+      .bottle-card h3 {
         font-size: 16px;
       }
     }
@@ -137,6 +195,8 @@
       </div>
     </div>
 
+    <div id="bottleContainer"></div>
+
     <div class="input-card">
       <h2>PromptPay/Bank Account</h2>
       <input type="text" id="accountDetails" placeholder="Enter PromptPay or bank account" />
@@ -146,11 +206,45 @@
   </div>
 
   <script>
+    const bottleContainer = document.getElementById("bottleContainer");
+
     function adjustBottles(change) {
       const numBottlesInput = document.getElementById("numBottles");
       let currentValue = parseInt(numBottlesInput.value) || 1;
       currentValue = Math.max(1, currentValue + change); // Ensure minimum value is 1
       numBottlesInput.value = currentValue;
+
+      renderBottleInputs(currentValue);
+    }
+
+    function renderBottleInputs(numBottles) {
+      bottleContainer.innerHTML = ""; // Clear existing inputs
+      for (let i = 1; i <= numBottles; i++) {
+        const bottleCard = document.createElement("div");
+        bottleCard.className = "bottle-card";
+        bottleCard.innerHTML = `
+          <h3>Bottle ${i} Participants</h3>
+          <div class="participant-input">
+            <input type="text" placeholder="Enter participant name" class="participant-name" />
+            <button type="button" onclick="addParticipant(${i})">Add</button>
+          </div>
+          <div id="participantList-${i}"></div>
+        `;
+        bottleContainer.appendChild(bottleCard);
+      }
+    }
+
+    function addParticipant(bottleIndex) {
+      const participantList = document.getElementById(`participantList-${bottleIndex}`);
+      const participantInput = participantList.previousElementSibling.querySelector(".participant-name");
+      const participantName = participantInput.value.trim();
+      if (participantName) {
+        const participantDiv = document.createElement("div");
+        participantDiv.textContent = participantName;
+        participantDiv.style.marginBottom = "5px";
+        participantList.appendChild(participantDiv);
+        participantInput.value = "";
+      }
     }
 
     function calculateBill() {
@@ -163,15 +257,11 @@
         return;
       }
 
-      const costPerBottle = totalAmount / numBottles;
-
-      alert(`
-        Total Amount: ${totalAmount} Baht
-        Number of Bottles: ${numBottles}
-        Cost Per Bottle: ${costPerBottle.toFixed(2)} Baht
-        Payment Details: ${accountDetails || "Not provided"}
-      `);
+      alert(`Calculation logic goes here!`);
     }
+
+    // Initialize with one bottle
+    renderBottleInputs(1);
   </script>
 </body>
 </html>
