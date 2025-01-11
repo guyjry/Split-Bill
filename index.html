@@ -193,7 +193,7 @@
 
     <div class="input-card">
       <h2>Total Amount (Baht)</h2>
-      <input type="number" id="totalAmount" placeholder="Enter amount" />
+      <input type="number" inputmode="numeric" id="totalAmount" placeholder="Enter amount" />
     </div>
 
     <div class="input-card">
@@ -245,7 +245,7 @@
         tableHTML += "</tr>";
       });
 
-      tableHTML += `<tr><td><input type="text" placeholder="Add participant" oninput="addParticipant(this)" /></td>`;
+      tableHTML += `<tr><td><input type="text" placeholder="Add participant" onblur="addParticipant(this)" /></td>`;
       for (let i = 1; i <= numBottles; i++) {
         tableHTML += `<td></td>`;
       }
