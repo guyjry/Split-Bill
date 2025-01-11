@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Split Bill for Drinks</title>
   <style>
-    /* Apple-Inspired Styling with Centered Layout */
+    /* Apple-Inspired Styling with Stepper Input */
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       margin: 0;
@@ -52,6 +52,42 @@
       text-align: left;
     }
 
+    .stepper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .stepper button {
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      font-weight: bold;
+      background-color: #f5f5f7;
+      border: 1px solid #d1d1d6;
+      border-radius: 12px;
+      color: #1d1d1f;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .stepper button:hover {
+      background-color: #e5e5ea;
+    }
+
+    .stepper input {
+      width: 80px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 500;
+      border: 1px solid #d1d1d6;
+      border-radius: 12px;
+      margin: 0 10px;
+      padding: 12px;
+      background-color: #f9f9f9;
+    }
+
     input {
       width: 100%;
       padding: 14px;
@@ -83,7 +119,6 @@
       font-weight: 600;
       cursor: pointer;
       transition: background-color 0.3s ease, transform 0.2s ease;
-      -webkit-appearance: none;
     }
 
     button:hover {
@@ -141,6 +176,17 @@
         padding: 20px;
       }
 
+      .stepper button {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+      }
+
+      .stepper input {
+        width: 60px;
+        font-size: 16px;
+      }
+
       input, button {
         padding: 12px;
         font-size: 15px;
@@ -161,7 +207,11 @@
       <input type="number" id="totalAmount" placeholder="Enter total amount" required>
 
       <label for="numBottles">Number of Bottles:</label>
-      <input type="number" id="numBottles" placeholder="Enter number of bottles" min="1" required>
+      <div class="stepper">
+        <button type="button" onclick="adjustBottles(-1)">-</button>
+        <input type="number" id="numBottles" value="1" min="1">
+        <button type="button" onclick="adjustBottles(1)">+</button>
+      </div>
 
       <label for="accountDetails">PromptPay/Bank Account (Optional):</label>
       <input type="text" id="accountDetails" placeholder="Enter your PromptPay or bank account details">
@@ -177,9 +227,12 @@
   </div>
 
   <script>
-    const resultContainer = document.getElementById("resultContainer");
-    const resultList = document.getElementById("resultList");
-    const accountDisplay = document.getElementById("accountDisplay");
+    function adjustBottles(change) {
+      const numBottlesInput = document.getElementById("numBottles");
+      let currentValue = parseInt(numBottlesInput.value) || 1;
+      currentValue = Math.max(1, currentValue + change); // Ensure minimum value is 1
+      numBottlesInput.value = currentValue;
+    }
 
     function calculateBill() {
       const totalAmount = parseFloat(document.getElementById("totalAmount").value);
@@ -200,6 +253,8 @@
         amounts[person] += costPerBottle / exampleParticipants.length;
       });
 
+      const resultList = document.getElementById("resultList");
+      const accountDisplay = document.getElementById("accountDisplay");
       resultList.innerHTML = "";
       for (const [person, amount] of Object.entries(amounts)) {
         const li = document.createElement("li");
@@ -210,7 +265,7 @@
       accountDisplay.innerHTML = accountDetails
         ? `<p><strong>Transfer to:</strong> ${accountDetails}</p>`
         : "";
-      resultContainer.style.display = "block";
+      document.getElementById("resultContainer").style.display = "block";
     }
   </script>
 </body>
