@@ -26,7 +26,7 @@
       display: block;
       margin-bottom: 5px;
     }
-    select, input, button {
+    input, button {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
@@ -43,7 +43,7 @@
       background-color: #45a049;
     }
     .bottle {
-      margin-bottom: 10px;
+      margin-bottom: 20px;
     }
     .result {
       display: none;
@@ -87,9 +87,6 @@
     const resultContainer = document.getElementById("resultContainer");
     const resultList = document.getElementById("resultList");
 
-    // Load saved names from localStorage
-    const savedNames = JSON.parse(localStorage.getItem("names")) || [];
-
     // Generate input fields for bottles
     document.getElementById("numBottles").addEventListener("input", () => {
       const numBottles = parseInt(document.getElementById("numBottles").value) || 0;
@@ -99,30 +96,29 @@
         const bottleDiv = document.createElement("div");
         bottleDiv.className = "bottle";
         bottleDiv.innerHTML = `
-          <label for="bottle${i}">Bottle ${i} Participants:</label>
-          <div id="participants-${i}">
-            <select id="dropdown-${i}">
-              <option value="" disabled selected>Select a person</option>
-              ${savedNames.map(name => `<option value="${name}">${name}</option>`).join("")}
-            </select>
-            <button type="button" onclick="addParticipant(${i})">Add Participant</button>
-            <ul id="list-${i}"></ul>
+          <label>Bottle ${i} Participants:</label>
+          <div id="participant-container-${i}">
+            <input type="text" class="participant-input" id="participant-${i}-1" 
+              placeholder="Enter participant name" oninput="addNewParticipant(${i}, 1)">
           </div>
         `;
         bottleInputsContainer.appendChild(bottleDiv);
       }
     });
 
-    // Add a participant to the list
-    function addParticipant(bottleIndex) {
-      const dropdown = document.getElementById(`dropdown-${bottleIndex}`);
-      const participant = dropdown.value;
-      const list = document.getElementById(`list-${bottleIndex}`);
+    // Dynamically add a new input field when the user types in the current one
+    function addNewParticipant(bottleIndex, participantIndex) {
+      const container = document.getElementById(`participant-container-${bottleIndex}`);
+      const currentInput = document.getElementById(`participant-${bottleIndex}-${participantIndex}`);
 
-      if (participant && !Array.from(list.children).some(li => li.textContent === participant)) {
-        const li = document.createElement("li");
-        li.textContent = participant;
-        list.appendChild(li);
+      if (currentInput.value !== "" && !document.getElementById(`participant-${bottleIndex}-${participantIndex + 1}`)) {
+        const newInput = document.createElement("input");
+        newInput.type = "text";
+        newInput.className = "participant-input";
+        newInput.id = `participant-${bottleIndex}-${participantIndex + 1}`;
+        newInput.placeholder = "Enter participant name";
+        newInput.oninput = () => addNewParticipant(bottleIndex, participantIndex + 1);
+        container.appendChild(newInput);
       }
     }
 
@@ -133,9 +129,13 @@
       const bottleDetails = [];
       const amounts = {};
 
+      // Gather participants for each bottle
       for (let i = 1; i <= numBottles; i++) {
-        const participants = Array.from(document.getElementById(`list-${i}`).children)
-          .map(li => li.textContent);
+        const participants = Array.from(
+          document.querySelectorAll(`#participant-container-${i} .participant-input`)
+        )
+          .map(input => input.value.trim())
+          .filter(name => name !== "");
         bottleDetails.push(participants);
       }
 
@@ -146,16 +146,8 @@
         participants.forEach(person => {
           if (!amounts[person]) amounts[person] = 0;
           amounts[person] += costPerPerson;
-
-          // Save new participants to localStorage
-          if (!savedNames.includes(person)) {
-            savedNames.push(person);
-          }
         });
       });
-
-      // Save updated names to localStorage
-      localStorage.setItem("names", JSON.stringify(savedNames));
 
       // Display results
       resultList.innerHTML = "";
@@ -169,4 +161,3 @@
   </script>
 </body>
 </html>
-
