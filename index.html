@@ -243,7 +243,7 @@
         tableHTML += "</tr>";
       });
 
-      tableHTML += `<tr><td><input type="text" placeholder="Add participant" onkeydown="addParticipant(event)" /></td>`;
+      tableHTML += `<tr><td><input type="text" placeholder="Add participant" oninput="addParticipant(this)" /></td>`;
       for (let i = 1; i <= numBottles; i++) {
         tableHTML += `<td></td>`;
       }
@@ -251,14 +251,11 @@
       tableContainer.innerHTML = tableHTML;
     }
 
-    function addParticipant(event) {
-      if (event.key === "Enter") {
-        const input = event.target;
-        const name = input.value.trim();
-        if (name) {
-          participants.push(name);
-          renderTable();
-        }
+    function addParticipant(input) {
+      const name = input.value.trim();
+      if (name && !participants.includes(name)) {
+        participants.push(name);
+        renderTable();
       }
     }
 
