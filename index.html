@@ -46,6 +46,20 @@
       margin-bottom: 10px;
     }
 
+    .input-card input {
+      width: 100%;
+      max-width: 300px;
+      height: 40px;
+      font-size: 16px;
+      border: 1px solid #d1d1d6;
+      border-radius: 12px;
+      text-align: center;
+      background-color: #f9f9f9;
+      box-sizing: border-box;
+      outline: none;
+      margin: 0 auto;
+    }
+
     .number-picker {
       display: flex;
       align-items: center;
@@ -76,17 +90,32 @@
       background-color: #005ecb;
     }
 
-    .number-picker input {
-      width: 60px;
+    .table-container {
+      margin-top: 30px;
       text-align: center;
+    }
+
+    .drink-table {
+      margin: 0 auto;
+      border-spacing: 0 15px;
+    }
+
+    .drink-table th {
       font-size: 16px;
-      font-weight: 500;
-      border: 1px solid #d1d1d6;
-      border-radius: 8px;
-      padding: 5px;
-      background-color: #f9f9f9;
-      box-sizing: border-box;
-      outline: none;
+      font-weight: 600;
+      color: #1d1d1f;
+      text-align: center;
+    }
+
+    .drink-table td {
+      font-size: 14px;
+      color: #1d1d1f;
+      text-align: center;
+    }
+
+    .checkbox-container {
+      display: flex;
+      justify-content: center;
     }
 
     button.calculate-btn {
@@ -109,9 +138,22 @@
       background-color: #005ecb;
     }
 
-    .table-container {
-      margin-top: 30px;
-      text-align: left;
+    .participant-container {
+      margin-top: 20px;
+    }
+
+    .participant-container input {
+      display: block;
+      width: 100%;
+      max-width: 300px;
+      margin: 10px auto;
+      height: 40px;
+      font-size: 16px;
+      border: 1px solid #d1d1d6;
+      border-radius: 12px;
+      padding: 5px;
+      text-align: center;
+      background-color: #f9f9f9;
     }
 
     .result-container {
@@ -145,10 +187,12 @@
       <h2>Number of Bottles</h2>
       <div class="number-picker">
         <button type="button" onclick="adjustBottles(-1)">-</button>
-        <input type="number" id="numBottles" value="1" min="1" />
+        <input type="number" id="numBottles" value="1" min="1" onchange="renderParticipantInputs()" />
         <button type="button" onclick="adjustBottles(1)">+</button>
       </div>
     </div>
+
+    <div class="participant-container" id="participantContainer"></div>
 
     <div class="table-container" id="tableContainer"></div>
 
@@ -163,36 +207,57 @@
   </div>
 
   <script>
+    const participantContainer = document.getElementById("participantContainer");
     const tableContainer = document.getElementById("tableContainer");
     const resultContainer = document.getElementById("resultContainer");
-
-    const participants = ["Guy", "Top", "Mark"]; // Example participants
+    let participants = [];
 
     function adjustBottles(change) {
       const numBottlesInput = document.getElementById("numBottles");
       let currentValue = parseInt(numBottlesInput.value) || 1;
       currentValue = Math.max(1, currentValue + change); // Ensure minimum value is 1
       numBottlesInput.value = currentValue;
+      renderParticipantInputs();
+    }
 
+    function renderParticipantInputs() {
+      const numBottles = parseInt(document.getElementById("numBottles").value) || 1;
+      participantContainer.innerHTML = "";
+
+      for (let i = 0; i < numBottles; i++) {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.placeholder = `Enter name for Bottle ${i + 1}`;
+        input.dataset.index = i;
+        input.onchange = updateParticipants;
+        participantContainer.appendChild(input);
+      }
+    }
+
+    function updateParticipants() {
+      const inputs = participantContainer.querySelectorAll("input");
+      participants = Array.from(inputs).map((input) => input.value.trim()).filter((name) => name !== "");
       renderTable();
     }
 
     function renderTable() {
       const numBottles = parseInt(document.getElementById("numBottles").value) || 1;
 
-      let tableHTML = '<table class="drink-table"><thead><tr><th></th>';
+      if (participants.length === 0) return;
+
+      let tableHTML = '<table class="drink-table"><thead><tr><th>Participant</th>';
       for (let i = 1; i <= numBottles; i++) {
         tableHTML += `<th>Bottle ${i}</th>`;
       }
       tableHTML += "</tr></thead><tbody>";
 
-      participants.forEach((participant, index) => {
+      participants.forEach((participant) => {
         tableHTML += `<tr><td>${participant}</td>`;
         for (let i = 1; i <= numBottles; i++) {
           tableHTML += `
             <td>
               <div class="checkbox-container">
-                <input type="checkbox" id="checkbox-${index}-${i}" />
+                <input type="checkbox" />
               </div>
             </td>`;
         }
@@ -204,43 +269,8 @@
     }
 
     function calculateBill() {
-      const totalAmount = parseFloat(document.getElementById("totalAmount").value);
-      const numBottles = parseInt(document.getElementById("numBottles").value);
-      const accountDetails = document.getElementById("accountDetails").value.trim();
-
-      if (!totalAmount || numBottles <= 0) {
-        alert("Please fill out all fields!");
-        return;
-      }
-
-      const costPerBottle = totalAmount / numBottles;
-      const amounts = {};
-
-      participants.forEach((participant, index) => {
-        amounts[participant] = 0;
-        for (let i = 1; i <= numBottles; i++) {
-          const checkbox = document.getElementById(`checkbox-${index}-${i}`);
-          if (checkbox && checkbox.checked) {
-            amounts[participant] += costPerBottle / participants.length;
-          }
-        }
-      });
-
-      // Display results
-      let resultHTML = "<ul>";
-      for (const [participant, amount] of Object.entries(amounts)) {
-        resultHTML += `<li>${participant}: ${amount.toFixed(2)} Baht</li>`;
-      }
-      resultHTML += "</ul>";
-      resultContainer.innerHTML = resultHTML;
-
-      if (accountDetails) {
-        resultContainer.innerHTML += `<p><strong>Transfer to:</strong> ${accountDetails}</p>`;
-      }
+      alert("Calculation logic goes here!");
     }
-
-    // Initialize table
-    renderTable();
   </script>
 </body>
 </html>
