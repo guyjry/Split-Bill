@@ -264,6 +264,7 @@
     function calculateBill() {
       const totalAmount = parseFloat(document.getElementById("totalAmount").value);
       const numBottles = parseInt(document.getElementById("numBottles").value);
+      const bottlePrice = totalAmount / numBottles; // Amount per bottle
       const amounts = {};
 
       if (!totalAmount || numBottles <= 0) {
@@ -271,15 +272,24 @@
         return;
       }
 
-      participants.forEach((participant, index) => {
+      // Initialize participants' payment to 0
+      participants.forEach((participant) => {
         amounts[participant] = 0;
-        for (let i = 1; i <= numBottles; i++) {
-          const checkbox = document.getElementById(`checkbox-${index}-${i}`);
-          if (checkbox && checkbox.checked) {
-            amounts[participant] += totalAmount / numBottles;
-          }
-        }
       });
+
+      // Calculate cost per bottle
+      for (let i = 1; i <= numBottles; i++) {
+        const sharedParticipants = participants.filter((participant, index) => {
+          const checkbox = document.getElementById(`checkbox-${index}-${i}`);
+          return checkbox && checkbox.checked;
+        });
+
+        const sharePerPerson = bottlePrice / sharedParticipants.length;
+
+        sharedParticipants.forEach((participant) => {
+          amounts[participant] += sharePerPerson;
+        });
+      }
 
       // Display the results
       let resultHTML = '<h2>Payment Summary for Each Participant</h2><ul>';
