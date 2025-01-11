@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Split Bill for Drinks</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f9f9f9;
+    }
+    h1 {
+      text-align: center;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .bottle-inputs {
+      margin-bottom: 20px;
+    }
+    .result {
+      display: none;
+      margin-top: 20px;
+    }
+    .result ul {
+      list-style: none;
+      padding: 0;
+    }
+    .result ul li {
+      background: #f1f1f1;
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Split Bill for Drinks</h1>
+  <div class="container">
+    <form id="billForm">
+      <label for="totalAmount">Total Amount (Baht):</label>
+      <input type="number" id="totalAmount" placeholder="Enter total amount" required>
+
+      <label for="numBottles">Number of Bottles:</label>
+      <input type="number" id="numBottles" placeholder="Enter number of bottles" min="1" required>
+
+      <div id="bottleInputs" class="bottle-inputs"></div>
+
+      <button type="button" onclick="calculateBill()">Calculate</button>
+    </form>
+
+    <div class="result" id="resultContainer">
+      <h2>Amount to Pay Per Person:</h2>
+      <ul id="resultList"></ul>
+    </div>
+  </div>
+
+  <script>
+    const bottleInputsContainer = document.getElementById('bottleInputs');
+    const form = document.getElementById('billForm');
+
+    // Generate input fields for bottles
+    document.getElementById('numBottles').addEventListener('input', () => {
+      const numBottles = parseInt(document.getElementById('numBottles').value) || 0;
+      bottleInputsContainer.innerHTML = ''; // Clear previous inputs
+
+      for (let i = 1; i <= numBottles; i++) {
+        const bottleDiv = document.createElement('div');
+        bottleDiv.innerHTML = `
+          <label for="bottle${i}">Bottle ${i} Participants (comma-separated):</label>
+          <input type="text" id="bottle${i}" placeholder="e.g., Alice, Bob, Charlie">
+        `;
+        bottleInputsContainer.appendChild(bottleDiv);
+      }
+    });
+
+    // Calculate the bill
+    function calculateBill() {
+      const totalAmount = parseFloat(document.getElementById('totalAmount').value);
+      const numBottles = parseInt(document.getElementById('numBottles').value);
+      const bottleDetails = [];
+      const resultContainer = document.getElementById('resultContainer');
+      const resultList = document.getElementById('resultList');
+
+      // Gather participants for each bottle
+      for (let i = 1; i <= numBottles; i++) {
+        const participants = document.getElementById(`bottle${i}`).value
+          .split(',')
+          .map(name => name.trim())
+          .filter(name => name !== '');
+        bottleDetails.push(participants);
+      }
+
+      // Calculate cost per bottle
+      const costPerBottle = totalAmount / numBottles;
+
+      // Calculate amount per person
+      const amounts = {};
+      bottleDetails.forEach(participants => {
+        const costPerPerson = costPerBottle / participants.length;
+        participants.forEach(person => {
+          if (!amounts[person]) amounts[person] = 0;
+          amounts[person] += costPerPerson;
+        });
+      });
+
+      // Display results
+      resultList.innerHTML = '';
+      for (const [person, amount] of Object.entries(amounts)) {
+        const li = document.createElement('li');
+        li.textContent = `${person}: ${amount.toFixed(2)} baht`;
+        resultList.appendChild(li);
+      }
+      resultContainer.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
