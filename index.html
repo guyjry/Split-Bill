@@ -18,25 +18,25 @@
     }
 
     .container {
-      max-width: 700px;
+      max-width: 600px;
       width: 100%;
       background-color: #ffffff;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      border-radius: 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       text-align: center;
-      margin: 30px auto;
+      margin: 40px auto;
     }
 
     h1 {
-      font-size: 28px;
-      font-weight: 700;
+      font-size: 26px;
+      font-weight: 600;
       color: #1d1d1f;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
 
     .input-card {
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
 
     .input-card h2 {
@@ -48,11 +48,11 @@
 
     .input-card input {
       width: 100%;
-      max-width: 300px;
-      height: 40px;
+      max-width: 280px;
+      height: 44px;
       font-size: 16px;
       border: 1px solid #d1d1d6;
-      border-radius: 12px;
+      border-radius: 16px;
       text-align: center;
       background-color: #f9f9f9;
       box-sizing: border-box;
@@ -71,23 +71,24 @@
     }
 
     .number-picker button {
-      width: 30px;
-      height: 30px;
-      font-size: 14px;
-      font-weight: bold;
-      color: #ffffff;
-      background-color: #007aff;
-      border: none;
+      width: 36px;
+      height: 36px;
+      font-size: 20px;
+      font-weight: 600;
+      color: #007aff;
+      background-color: #ffffff;
+      border: 1px solid #d1d1d6;
       border-radius: 50%;
       cursor: pointer;
       display: flex;
       justify-content: center;
       align-items: center;
-      transition: background-color 0.3s ease;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
     .number-picker button:hover {
-      background-color: #005ecb;
+      background-color: #f0f0f5;
+      border-color: #007aff;
     }
 
     .table-container {
@@ -98,21 +99,21 @@
     .drink-table {
       margin: 0 auto;
       width: 100%;
-      max-width: 600px;
+      max-width: 500px;
       border-spacing: 0;
       border-collapse: collapse;
     }
 
     .drink-table th,
     .drink-table td {
-      padding: 12px;
-      border-bottom: 1px solid #d1d1d6;
+      padding: 14px;
+      border-bottom: 1px solid #e0e0e5;
     }
 
     .drink-table th {
       font-size: 16px;
       font-weight: 600;
-      color: #1d1d1f;
+      color: #6e6e73;
       text-align: center;
       background-color: #f9f9f9;
     }
@@ -126,10 +127,10 @@
     .drink-table input[type="text"] {
       width: 100%;
       max-width: 200px;
-      height: 35px;
+      height: 40px;
       font-size: 14px;
       border: 1px solid #d1d1d6;
-      border-radius: 8px;
+      border-radius: 12px;
       padding: 5px;
       background-color: #f9f9f9;
       text-align: center;
@@ -138,16 +139,15 @@
     .drink-table input[type="checkbox"] {
       width: 20px;
       height: 20px;
-      border-radius: 50%;
       accent-color: #007aff;
     }
 
     button.calculate-btn {
       display: block;
       width: 100%;
-      max-width: 200px;
-      margin: 20px auto 0;
-      padding: 12px 20px;
+      max-width: 280px;
+      margin: 30px auto 0;
+      padding: 14px 20px;
       font-size: 16px;
       font-weight: 600;
       color: #ffffff;
@@ -155,7 +155,7 @@
       border: none;
       border-radius: 12px;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: background-color 0.3s ease;
     }
 
     button.calculate-btn:hover {
@@ -220,7 +220,7 @@
     function adjustBottles(change) {
       const numBottlesInput = document.getElementById("numBottles");
       let currentValue = parseInt(numBottlesInput.value) || 1;
-      currentValue = Math.max(1, currentValue + change); // Ensure minimum value is 1
+      currentValue = Math.max(1, currentValue + change);
       numBottlesInput.value = currentValue;
       renderTable();
     }
@@ -245,7 +245,7 @@
         tableHTML += "</tr>";
       });
 
-      tableHTML += `<tr><td><input type="text" placeholder="Add participant" onblur="addParticipant(this)" /></td>`;
+      tableHTML += `<tr><td><input type="text" placeholder="Add participant" oninput="handleParticipantInput(this)" /></td>`;
       for (let i = 1; i <= numBottles; i++) {
         tableHTML += `<td></td>`;
       }
@@ -253,18 +253,27 @@
       tableContainer.innerHTML = tableHTML;
     }
 
-    function addParticipant(input) {
+    function handleParticipantInput(input) {
       const name = input.value.trim();
-      if (name && !participants.includes(name)) {
-        participants.push(name);
-        renderTable();
+      if (!input.nextElementSibling && name.length > 0) {
+        const tbody = tableContainer.querySelector("tbody");
+        const newRow = document.createElement("tr");
+
+        newRow.innerHTML = `<td><input type="text" placeholder="Add participant" oninput="handleParticipantInput(this)" /></td>`;
+        const numBottles = parseInt(document.getElementById("numBottles").value);
+
+        for (let i = 1; i <= numBottles; i++) {
+          newRow.innerHTML += "<td></td>";
+        }
+
+        tbody.appendChild(newRow);
       }
     }
 
     function calculateBill() {
       const totalAmount = parseFloat(document.getElementById("totalAmount").value);
       const numBottles = parseInt(document.getElementById("numBottles").value);
-      const bottlePrice = totalAmount / numBottles; // Amount per bottle
+      const bottlePrice = totalAmount / numBottles;
       const amounts = {};
 
       if (!totalAmount || numBottles <= 0) {
@@ -272,12 +281,10 @@
         return;
       }
 
-      // Initialize participants' payment to 0
       participants.forEach((participant) => {
         amounts[participant] = 0;
       });
 
-      // Calculate cost per bottle
       for (let i = 1; i <= numBottles; i++) {
         const sharedParticipants = participants.filter((participant, index) => {
           const checkbox = document.getElementById(`checkbox-${index}-${i}`);
@@ -291,7 +298,6 @@
         });
       }
 
-      // Display the results
       let resultHTML = '<h2>Payment Summary for Each Participant</h2><ul>';
       for (const [participant, amount] of Object.entries(amounts)) {
         resultHTML += `<li>${participant}: ${amount.toFixed(2)} Baht</li>`;
