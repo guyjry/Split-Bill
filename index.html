@@ -97,7 +97,16 @@
 
     .drink-table {
       margin: 0 auto;
-      border-spacing: 0 15px;
+      width: 100%;
+      max-width: 600px;
+      border-spacing: 0;
+      border-collapse: collapse;
+    }
+
+    .drink-table th,
+    .drink-table td {
+      padding: 12px;
+      border-bottom: 1px solid #d1d1d6;
     }
 
     .drink-table th {
@@ -105,6 +114,7 @@
       font-weight: 600;
       color: #1d1d1f;
       text-align: center;
+      background-color: #f9f9f9;
     }
 
     .drink-table td {
@@ -113,9 +123,16 @@
       text-align: center;
     }
 
-    .checkbox-container {
-      display: flex;
-      justify-content: center;
+    .drink-table input {
+      width: 100%;
+      max-width: 200px;
+      height: 35px;
+      font-size: 14px;
+      border: 1px solid #d1d1d6;
+      border-radius: 8px;
+      padding: 5px;
+      background-color: #f9f9f9;
+      text-align: center;
     }
 
     button.calculate-btn {
@@ -136,24 +153,6 @@
 
     button.calculate-btn:hover {
       background-color: #005ecb;
-    }
-
-    .participant-container {
-      margin-top: 20px;
-    }
-
-    .participant-container input {
-      display: block;
-      width: 100%;
-      max-width: 300px;
-      margin: 10px auto;
-      height: 40px;
-      font-size: 16px;
-      border: 1px solid #d1d1d6;
-      border-radius: 12px;
-      padding: 5px;
-      text-align: center;
-      background-color: #f9f9f9;
     }
 
     .result-container {
@@ -187,12 +186,10 @@
       <h2>Number of Bottles</h2>
       <div class="number-picker">
         <button type="button" onclick="adjustBottles(-1)">-</button>
-        <input type="number" id="numBottles" value="1" min="1" onchange="renderParticipantInputs()" />
+        <input type="number" id="numBottles" value="1" min="1" onchange="renderTable()" />
         <button type="button" onclick="adjustBottles(1)">+</button>
       </div>
     </div>
-
-    <div class="participant-container" id="participantContainer"></div>
 
     <div class="table-container" id="tableContainer"></div>
 
@@ -207,7 +204,6 @@
   </div>
 
   <script>
-    const participantContainer = document.getElementById("participantContainer");
     const tableContainer = document.getElementById("tableContainer");
     const resultContainer = document.getElementById("resultContainer");
     let participants = [];
@@ -217,33 +213,11 @@
       let currentValue = parseInt(numBottlesInput.value) || 1;
       currentValue = Math.max(1, currentValue + change); // Ensure minimum value is 1
       numBottlesInput.value = currentValue;
-      renderParticipantInputs();
-    }
-
-    function renderParticipantInputs() {
-      const numBottles = parseInt(document.getElementById("numBottles").value) || 1;
-      participantContainer.innerHTML = "";
-
-      for (let i = 0; i < numBottles; i++) {
-        const input = document.createElement("input");
-        input.type = "text";
-        input.placeholder = `Enter name for Bottle ${i + 1}`;
-        input.dataset.index = i;
-        input.onchange = updateParticipants;
-        participantContainer.appendChild(input);
-      }
-    }
-
-    function updateParticipants() {
-      const inputs = participantContainer.querySelectorAll("input");
-      participants = Array.from(inputs).map((input) => input.value.trim()).filter((name) => name !== "");
       renderTable();
     }
 
     function renderTable() {
       const numBottles = parseInt(document.getElementById("numBottles").value) || 1;
-
-      if (participants.length === 0) return;
 
       let tableHTML = '<table class="drink-table"><thead><tr><th>Participant</th>';
       for (let i = 1; i <= numBottles; i++) {
@@ -251,26 +225,41 @@
       }
       tableHTML += "</tr></thead><tbody>";
 
-      participants.forEach((participant) => {
+      participants.forEach((participant, index) => {
         tableHTML += `<tr><td>${participant}</td>`;
         for (let i = 1; i <= numBottles; i++) {
           tableHTML += `
             <td>
-              <div class="checkbox-container">
-                <input type="checkbox" />
-              </div>
+              <input type="checkbox" id="checkbox-${index}-${i}" />
             </td>`;
         }
         tableHTML += "</tr>";
       });
 
-      tableHTML += "</tbody></table>";
+      tableHTML += `<tr><td><input type="text" placeholder="Add participant" onkeydown="addParticipant(event)" /></td>`;
+      for (let i = 1; i <= numBottles; i++) {
+        tableHTML += `<td></td>`;
+      }
+      tableHTML += "</tr></tbody></table>";
       tableContainer.innerHTML = tableHTML;
+    }
+
+    function addParticipant(event) {
+      if (event.key === "Enter") {
+        const input = event.target;
+        const name = input.value.trim();
+        if (name) {
+          participants.push(name);
+          renderTable();
+        }
+      }
     }
 
     function calculateBill() {
       alert("Calculation logic goes here!");
     }
+
+    renderTable();
   </script>
 </body>
 </html>
